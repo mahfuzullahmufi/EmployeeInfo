@@ -1,0 +1,36 @@
+﻿@model Employee
+
+<form method="post" asp-action="Create">
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary">Create Employee Data</h2>
+            <hr />
+        </div>
+        <div class="mb-3">
+            <label asp-for="EmployeeName">Employee Name</label>
+            <input asp-for="EmployeeName" class="form-control" />
+            <span asp-validation-for="EmployeeName" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="EmployeeDesignation">Employee Designation</label>
+            <input asp-for="EmployeeDesignation" class="form-control" />
+            <span asp-validation-for="EmployeeDesignation" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Salary">Salary</label>
+            <input asp-for="Salary" class="form-control" />
+            <span asp-validation-for="Salary" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:150px">Create</button>
+        <a asp-controller="Employee" asp-action="Index" class="btn btn-secondary" style="width:150px">
+            Back
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
