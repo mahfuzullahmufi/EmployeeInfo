@@ -19,7 +19,7 @@
     <br /><br />
 
 
-<table class="table table-bordered table-striped" style="width:100%">
+    <table id="employeeTable" class="table table-bordered table-striped" style="width:100%">
     <thead>
         <tr>
             <th>
@@ -44,8 +44,7 @@
                     @obj.EmployeeName
                 </td>
                 <td width="30%">
-                    @* @obj.EmployeeDesignation *@
-                        @obj.EmployeeDesignation.GetDisplayName()
+                    @obj.EmployeeDesignation.GetDisplayName()
                 </td>
                 <td width="20%">
                     @obj.Salary
@@ -53,7 +52,6 @@
                 <td>
                     <div class="w-75 btn-group" role="group">
                             <a asp-controller="Employee" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-primary mx-1">Edit</a>
-                            @* <a asp-controller="Employee"  asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-danger mx-1">Delete</a> *@
                             <form asp-controller="Employee" asp-action="Delete" asp-route-id="@obj.Id" method="post">
                                 <input type="submit" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure?')" />
                             </form>
@@ -65,4 +63,23 @@
 
 </table>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include DataTables CSS and JS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+
+<script >
+    var js = jQuery.noConflict(true);
+    js(document).ready(function () {
+        js('#employeeTable').DataTable({
+        });
+    });
+
+    // $(document).ready(function () {
+    //     $('#employeeTable').DataTable({
+    //     });
+    // });
+</script>
 

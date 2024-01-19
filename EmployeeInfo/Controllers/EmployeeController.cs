@@ -1,4 +1,5 @@
 ﻿using EmployeeInfo.Data;
+using EmployeeInfo.Extentions;
 using EmployeeInfo.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,10 @@ namespace EmployeeInfo.Controllers
         public IActionResult Index()
         {
             IEnumerable<Employee> objEmployeeList = _db.Employees.OrderByDescending(x => x.CreatedDate);
+            foreach(var emp in objEmployeeList)
+            {
+                var firstName = emp.EmployeeName.GetFirstName();
+            }
             return View(objEmployeeList);
         }
 
