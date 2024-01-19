@@ -17,7 +17,9 @@
                 <option value="">-- Select Designation --</option>
                 @foreach (var value in Enum.GetValues(typeof(DesignationType)))
                 {
-                    <option value="@value">@((DesignationType)value)</option>
+                    <option value="@value">
+                        @(((DesignationType)value).GetDisplayName())
+                    </option>
                 }
             </select>
             <span asp-validation-for="EmployeeDesignation" class="text-danger"></span>
