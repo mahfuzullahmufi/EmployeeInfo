@@ -13,7 +13,13 @@
         </div>
         <div class="mb-3">
             <label asp-for="EmployeeDesignation">Employee Designation</label>
-            <input asp-for="EmployeeDesignation" class="form-control" />
+            <select asp-for="EmployeeDesignation" class="form-control">
+                <option value="">-- Select Designation --</option>
+                @foreach (var value in Enum.GetValues(typeof(DesignationType)))
+                {
+                    <option value="@value">@((DesignationType)value)</option>
+                }
+            </select>
             <span asp-validation-for="EmployeeDesignation" class="text-danger"></span>
         </div>
         <div class="mb-3">

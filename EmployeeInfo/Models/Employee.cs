@@ -11,7 +11,7 @@ namespace EmployeeInfo.Models
         public string EmployeeName { get; set; }
         [Required]
         [DisplayName("Employee Designation")]
-        public string EmployeeDesignation { get; set; }
+        public DesignationType EmployeeDesignation { get; set; }
         [Range(30000, 600000, ErrorMessage = "Salary must be between 30000 and 600000 !!")]
         public double? Salary { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;

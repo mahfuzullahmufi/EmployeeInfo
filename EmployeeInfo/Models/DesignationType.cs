@@ -1,9 +1,14 @@
-﻿namespace EmployeeInfo.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EmployeeInfo.Models
 {
     public enum DesignationType
     {
+        [Display(Name = "Associate Software Engineer")]
         AssociateSoftwareEngineer = 1,
-        SoftwareEngineering = 2,
+        [Display(Name = "Software Engineer")]
+        SoftwareEngineer = 2,
+        [Display(Name = "Project Manager")]
         ProjectManager = 3,
     }
 }
