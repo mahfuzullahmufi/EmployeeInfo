@@ -1,5 +1,4 @@
 ﻿using EmployeeInfo.Data;
-using EmployeeInfo.Extentions;
 using EmployeeInfo.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,14 +13,18 @@ namespace EmployeeInfo.Controllers
             _db = db;
         }
 
-        public IActionResult Index()
+        public ActionResult Index(int page = 1, int pageSize = 10)
         {
-            IEnumerable<Employee> objEmployeeList = _db.Employees.OrderByDescending(x => x.CreatedDate);
-            foreach(var emp in objEmployeeList)
-            {
-                var firstName = emp.EmployeeName.GetFirstName();
-            }
-            return View(objEmployeeList);
+            var model = new PagedViewModel<Employee>();
+            var query = _db.Employees.OrderBy(e => e.CreatedDate);
+
+            model.CurrentPage = page;
+            model.PageSize = pageSize;
+            model.TotalCount = query.Count();
+            model.TotalPages = (int)Math.Ceiling((double)model.TotalCount / pageSize);
+            model.PagedData = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            return View(model);
         }
 
         public IActionResult Create()
