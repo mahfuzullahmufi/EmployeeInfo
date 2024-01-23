@@ -1,9 +1,9 @@
-﻿@* @model IEnumerable<Employee> *@
-@model PagedViewModel<Employee>
+﻿@model PagedViewModel<Employee>
 @{
     ViewData["Title"] = "Index";
 }
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/dist/toastr.min.css">
 
 
 <div class="container p-3">
@@ -31,7 +31,7 @@
     </div>
    
 
-    <table id="employeeTable" class="table table-bordered table-striped" style="width:100%">
+    <table id="dataTable" class="table table-bordered table-striped" style="width:100%">
     <thead>
         <tr>
             <th>
@@ -49,61 +49,135 @@
         </tr>
     </thead>
     <tbody>
-        @foreach(var obj in Model.PagedData)
-        {
-            <tr>
-                <td width="30%">
-                    @obj.EmployeeName
-                </td>
-                <td width="30%">
-                    @obj.EmployeeDesignation.GetDisplayName()
-                </td>
-                <td width="20%">
-                    @obj.Salary
-                </td>
-                <td>
-                    <div class="w-75 btn-group" role="group">
-                            <a asp-controller="Employee" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-primary mx-1">Edit</a>
-                            <form asp-controller="Employee" asp-action="Delete" asp-route-id="@obj.Id" method="post">
-                                <input type="submit" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure?')" />
-                            </form>
-                    </div>
-                </td>
-            </tr>
-        }
     </tbody>
 </table>
 </div>
 
 <div class="d-flex justify-content-between">
     <div>
-        <p>
-            Showing items @(Model.PagedData.Any() ? ((Model.CurrentPage - 1) * Model.PageSize) + 1 : 0)
-            to @(Model.CurrentPage * Model.PageSize > Model.TotalCount ? Model.TotalCount : Model.CurrentPage * Model.PageSize)
-            of @Model.TotalCount.
+        <p id="showingInfo">
         </p>
     </div>
+
     <div>
-        <nav aria-label="Page navigation example">
-            <ul class="pagination">
-                @for (int i = 1; i <= Model.TotalPages; i++)
-                {
-                    <li class="page-item ">
-                        <span class="page-link @(i == Model.CurrentPage ? "bg-secondary" : "")">@Html.ActionLink(i.ToString(), "Index", new { page = i, pageSize = Model.PageSize })</span>
-                    </li>
-                }
-            </ul>
-        </nav>
+        <ul id="pagination" class="pagination">
+        </ul>
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/dist/toastr.min.js"></script>
 <script>
+    var currentPage = 1;
+    var pageSize = 10;
+
+    $(document).ready(function () {
+        fetchDataAndUpdateTable(currentPage, pageSize);
+    });
+
+    function fetchDataAndUpdateTable(page, pageSize) {
+        pageSize = pageSize || document.getElementById('pageSize').value;
+
+        $.ajax({
+            url: '@Url.Action("LoadDataTable", "Employee")',
+            type: 'GET',
+            data: { page: page, pageSize: pageSize },
+            success: function (data) {
+                updateTable(data);
+                updatePagination(data);
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Request Error:", status, error);
+                console.log(xhr.responseText);
+            }
+        });
+    }
+
+    function updateTable(data) {
+        $('#dataTable tbody').empty();
+
+        for (var i = 0; i < data.pagedData.length; i++) {
+            var row = '<tr>';
+            row += '<td>' + data.pagedData[i].employeeName + '</td>';
+            row += '<td>' + getDesignationString(data.pagedData[i].employeeDesignation) + '</td>';
+            row += '<td>' + data.pagedData[i].salary + '</td>';
+            row += '<td>';
+            row += '<a href="/Employee/Edit?id=' + data.pagedData[i].id + ' " class="btn btn-primary mx-1">Edit</a>';
+            row += '<a class="btn btn-danger" onclick="deleteItem(' + data.pagedData[i].id + ')">Delete</a>';
+            row += '</td>';
+            row += '</tr>';
+            $('#dataTable tbody').append(row);
+        }
+    }
+
+    function getDesignationString(designation) {
+        switch (designation) {
+            case 1: return 'Associate Software Engineer';
+            case 2: return 'Software Engineer';
+            case 3: return 'Project Manager';
+            default: return 'Unknown';
+        }
+    }
+
+    function editItem(itemId) {
+        console.log("Edit Item with ID:", itemId);
+
+        $.ajax({
+            url: 'Employee/Edit/' + itemId,
+            type: 'GET',
+            success: function (data) {
+                console.log("Response:", data);
+            }
+        })
+    }
+
+    function deleteItem(itemId) {
+        console.log("Delete Item with ID:", itemId);
+
+        $.ajax({
+            url: 'Employee/Delete/' + itemId,
+            type: 'POST',
+            success: function (data) {
+                console.log("Response:", data);
+                if (data) {
+                    fetchDataAndUpdateTable(currentPage, pageSize);
+                    toastr.error('Employee deleted successfully!');
+                }
+            }
+        })
+    }
+
     function changePageSize() {
         var selectedValue = document.getElementById('pageSize').value;
+        currentPage = 1;
+        fetchDataAndUpdateTable(currentPage, selectedValue);
+    }
 
-        console.log("Selected Value: " + selectedValue);
+    function changePage(pageChange) {
+        currentPage = pageChange;
+        fetchDataAndUpdateTable(pageChange);
+    }
 
-        
+    function updatePagination(data) {
+        $('#pagination').empty();
+
+        var totalPages = data.totalPages;
+
+        for (var i = 1; i <= totalPages; i++) {
+            var $pageItem = $('<li class="page-item"><a class="page-link" href="#" onclick="changePage(' + i + ')">' + i + '</a></li>');
+
+            if (i === currentPage) {
+                $pageItem.addClass('active');
+            }
+
+            $('#pagination').append($pageItem);
+        }
+
+        $('#showingInfo').empty();
+        var startItem = (data.currentPage - 1) * data.pageSize + 1;
+        var endItem = Math.min(data.currentPage * data.pageSize, data.totalCount);
+        var showingInfo = 'Showing items ' + startItem + ' to ' + endItem + ' of ' + data.totalCount + '.';
+        $('#showingInfo').text(showingInfo);
     }
 </script>
 

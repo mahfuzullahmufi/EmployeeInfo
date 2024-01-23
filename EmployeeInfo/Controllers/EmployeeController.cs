@@ -13,7 +13,18 @@ namespace EmployeeInfo.Controllers
             _db = db;
         }
 
-        public ActionResult Index(int page = 1, int pageSize = 10)
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        public ActionResult LoadDataTable(int page = 1, int pageSize = 10)
+        {
+            var model = GetDataTableViewModel(page, pageSize);
+            return Json(model);
+        }
+
+        private PagedViewModel<Employee> GetDataTableViewModel(int page, int pageSize)
         {
             var model = new PagedViewModel<Employee>();
             var query = _db.Employees.OrderBy(e => e.CreatedDate);
@@ -24,8 +35,9 @@ namespace EmployeeInfo.Controllers
             model.TotalPages = (int)Math.Ceiling((double)model.TotalCount / pageSize);
             model.PagedData = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
-            return View(model);
+            return model;
         }
+
 
         public IActionResult Create()
         {
@@ -94,8 +106,7 @@ namespace EmployeeInfo.Controllers
 
             _db.Employees.Remove(employeeFromDb);
             _db.SaveChanges();
-            TempData["success"] = "Employee deleted successfully!";
-            return RedirectToAction("Index");
+            return Ok(true);
         }
     }
 }
