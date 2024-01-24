@@ -27,7 +27,7 @@ namespace EmployeeInfo.Controllers
         private PagedViewModel<Employee> GetDataTableViewModel(int page, int pageSize)
         {
             var model = new PagedViewModel<Employee>();
-            var query = _db.Employees.OrderBy(e => e.CreatedDate);
+            var query = _db.Employees.OrderBy(e => e.EmployeeName).ThenBy(x => x.Salary);
 
             model.CurrentPage = page;
             model.PageSize = pageSize;

@@ -34,14 +34,21 @@
     <table id="dataTable" class="table table-bordered table-striped" style="width:100%">
     <thead>
         <tr>
-            <th>
+                <th data-sort="asc" data-column="0">
                  Employee Name
+                    <span class="float-right sort-icon">
+                <i class="bi bi-arrow-up"></i>
+                @* <i class="bi bi-arrow-down"></i> *@
+                </span>
             </th>
             <th>
                  Employee Designation
             </th>
-            <th>
+                <th data-sort="asc" data-column="2">
                  Employee Salary
+                    <span class="float-right sort-icon">
+                        <i class="bi bi-arrow-up"></i>
+                    </span>
             </th>
             <th>
                 Action
@@ -73,6 +80,21 @@
 
     $(document).ready(function () {
         fetchDataAndUpdateTable(currentPage, pageSize);
+
+        sortTable(0, 'asc');
+        $('#dataTable th .sort-icon').on('click', function () {
+            var columnIndex = $(this).closest('th').data('column');
+            var currentSortOrder = $(this).closest('th').data('sort');
+            var newSortOrder = (currentSortOrder === 'asc') ? 'desc' : 'asc';
+
+            $(this).closest('th').data('sort', newSortOrder);
+
+            $(this).find('i').toggleClass('bi-arrow-up', newSortOrder === 'asc');
+            $(this).find('i').toggleClass('bi-arrow-down', newSortOrder === 'desc');
+
+            sortTable(columnIndex, newSortOrder);
+        });
+
     });
 
     function fetchDataAndUpdateTable(page, pageSize) {
@@ -178,6 +200,41 @@
         var endItem = Math.min(data.currentPage * data.pageSize, data.totalCount);
         var showingInfo = 'Showing items ' + startItem + ' to ' + endItem + ' of ' + data.totalCount + '.';
         $('#showingInfo').text(showingInfo);
+    }
+
+    function sortTable(columnIndex, sortOrder) {
+        var $table = $('#dataTable');
+        var rows = $table.find('tbody tr').get();
+
+        rows.sort(function (a, b) {
+            var aValue, bValue;
+
+            var columnType = getColumnValueType(columnIndex);
+
+            if (columnType === 'text') {
+                aValue = $(a).find('td:eq(' + columnIndex + ')').text().trim().toLowerCase();
+                bValue = $(b).find('td:eq(' + columnIndex + ')').text().trim().toLowerCase();
+            } else if (columnType === 'numeric') {
+                aValue = parseFloat($(a).find('td:eq(' + columnIndex + ')').text().trim()) || 0;
+                bValue = parseFloat($(b).find('td:eq(' + columnIndex + ')').text().trim()) || 0;
+            }
+
+            if (sortOrder === 'asc') {
+                return columnType === 'text' ? aValue.localeCompare(bValue) : aValue - bValue;
+            } else {
+                return columnType === 'text' ? bValue.localeCompare(aValue) : bValue - aValue;
+            }
+        });
+
+        $.each(rows, function (index, row) {
+            $table.find('tbody').append(row);
+        });
+    }
+
+    function getColumnValueType(columnIndex) {
+        var firstCellValue = $('#dataTable tbody tr:first td:eq(' + columnIndex + ')').text().trim();
+
+        return !isNaN(parseFloat(firstCellValue)) ? 'numeric' : 'text';
     }
 </script>
 
