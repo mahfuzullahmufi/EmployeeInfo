@@ -16,23 +16,17 @@ namespace EmployeeInfo.Service.Service
 
         public async Task<PagedViewModel<Employee>> GetAllAsync(int page, int pageSize)
         {
-            try
-            {
-                PagedViewModel<Employee> model = new PagedViewModel<Employee>();
-                var employeeList = await _employeeRepository.GetAllAsync();
+            PagedViewModel<Employee> model = new PagedViewModel<Employee>();
+            var employeeList = await _employeeRepository.GetAllAsync();
 
-                model.CurrentPage = page;
-                model.PageSize = pageSize;
-                model.TotalCount = employeeList.Count();
-                model.TotalPages = (int)Math.Ceiling((double)model.TotalCount / pageSize);
-                model.PagedData = employeeList.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            model.CurrentPage = page;
+            model.PageSize = pageSize;
+            model.TotalCount = employeeList.Count();
+            model.TotalPages = (int)Math.Ceiling((double)model.TotalCount / pageSize);
+            model.PagedData = employeeList.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
-                return model;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            return model;
+            
         }
 
         public async Task<Employee?> GetByIdAsync(int id)
@@ -47,6 +41,7 @@ namespace EmployeeInfo.Service.Service
 
             if(employee.Id>0)
                 return true;
+
             return false;
         }
         
@@ -54,7 +49,6 @@ namespace EmployeeInfo.Service.Service
         {
             var employee = await _employeeRepository.EditAsync(entity);
             await _employeeRepository.SaveChangesAsync();
-
             return true;
         }
 

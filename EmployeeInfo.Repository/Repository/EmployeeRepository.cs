@@ -1,5 +1,5 @@
-﻿using EmployeeInfo.Entities.Data;
-using EmployeeInfo.Entities.Models;
+﻿using EmployeeInfo.Entities.Models;
+using EmployeeInfo.Repository.Data;
 using EmployeeInfo.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 

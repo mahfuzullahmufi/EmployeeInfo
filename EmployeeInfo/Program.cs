@@ -1,4 +1,4 @@
-using EmployeeInfo.Entities.Data;
+using EmployeeInfo.Repository.Data;
 using EmployeeInfo.Repository.IRepository;
 using EmployeeInfo.Repository.Repository;
 using EmployeeInfo.Service.IService;

@@ -24,7 +24,6 @@ namespace EmployeeInfo.Controllers
             return Json(model);
         }
 
-
         public IActionResult Create()
         {
 
@@ -50,7 +49,6 @@ namespace EmployeeInfo.Controllers
                 return NotFound();
 
             var employee = await _employeeService.GetByIdAsync(id);
-
             if (employee == null)
                 return NotFound();
 
@@ -62,9 +60,12 @@ namespace EmployeeInfo.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _employeeService.EditAsync(obj);
-                TempData["success"] = "Employee Data edited successfully!";
-                return RedirectToAction("Index");
+                var result = await _employeeService.EditAsync(obj);
+                if(result)
+                {
+                    TempData["success"] = "Employee Data edited successfully!";
+                    return RedirectToAction("Index");
+                }
             }
             return View(obj);
         }
