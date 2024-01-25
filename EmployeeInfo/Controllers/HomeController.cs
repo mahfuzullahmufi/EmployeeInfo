@@ -1,4 +1,4 @@
-﻿using EmployeeInfo.Models;
+﻿using EmployeeInfo.Entities.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 

@@ -1,4 +1,4 @@
-﻿namespace EmployeeInfo.Models
+﻿namespace EmployeeInfo.Entities.Models
 {
     public class PagedViewModel<T>
     {

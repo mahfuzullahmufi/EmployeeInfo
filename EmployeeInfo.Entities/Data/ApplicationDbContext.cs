@@ -1,7 +1,7 @@
-﻿using EmployeeInfo.Models;
+﻿using EmployeeInfo.Entities.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace EmployeeInfo.Data
+namespace EmployeeInfo.Entities.Data
 {
     public class ApplicationDbContext : DbContext
     {

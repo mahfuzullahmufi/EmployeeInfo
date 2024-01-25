@@ -1,7 +1,8 @@
-﻿using System.ComponentModel;
+﻿using EmployeeInfo.Entities.Enum;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace EmployeeInfo.Models
+namespace EmployeeInfo.Entities.Models
 {
     public class Employee
     {

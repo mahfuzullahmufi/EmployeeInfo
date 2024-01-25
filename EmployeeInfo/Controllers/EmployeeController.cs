@@ -1,16 +1,16 @@
-﻿using EmployeeInfo.Data;
-using EmployeeInfo.Models;
+﻿using EmployeeInfo.Entities.Models;
+using EmployeeInfo.Service.IService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeInfo.Controllers
 {
     public class EmployeeController : Controller
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IEmployeeService _employeeService;
 
-        public EmployeeController(ApplicationDbContext db)
+        public EmployeeController(IEmployeeService employeeService)
         {
-            _db = db;
+            _employeeService = employeeService;
         }
 
         public ActionResult Index()
@@ -18,24 +18,10 @@ namespace EmployeeInfo.Controllers
             return View();
         }
 
-        public ActionResult LoadDataTable(int page = 1, int pageSize = 10)
+        public  async Task<IActionResult> LoadDataTable(int page = 1, int pageSize = 10)
         {
-            var model = GetDataTableViewModel(page, pageSize);
+            var model = await _employeeService.GetAllAsync(page, pageSize);
             return Json(model);
-        }
-
-        private PagedViewModel<Employee> GetDataTableViewModel(int page, int pageSize)
-        {
-            var model = new PagedViewModel<Employee>();
-            var query = _db.Employees.OrderBy(e => e.EmployeeName).ThenBy(x => x.Salary);
-
-            model.CurrentPage = page;
-            model.PageSize = pageSize;
-            model.TotalCount = query.Count();
-            model.TotalPages = (int)Math.Ceiling((double)model.TotalCount / pageSize);
-            model.PagedData = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-
-            return model;
         }
 
 
@@ -46,12 +32,11 @@ namespace EmployeeInfo.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Employee obj)
+        public async Task<IActionResult> Create(Employee obj)
         {
             if (ModelState.IsValid)
             {
-                _db.Employees.Add(obj);
-                _db.SaveChanges();
+                await _employeeService.AddAsync(obj);
                 TempData["success"] = "Employee added successfully!";
                 return RedirectToAction("Index");
             }
@@ -59,30 +44,25 @@ namespace EmployeeInfo.Controllers
         }
 
 
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null || id == 0)
-            {
+            if (id == 0)
                 return NotFound();
-            }
 
-            var employeeFromDb = _db.Employees.Find(id);
+            var employee = await _employeeService.GetByIdAsync(id);
 
-            if (employeeFromDb == null)
-            {
+            if (employee == null)
                 return NotFound();
-            }
 
-            return View(employeeFromDb);
+            return View(employee);
         }
 
         [HttpPost]
-        public IActionResult Edit(Employee obj)
+        public async Task<IActionResult> Edit(Employee obj)
         {
             if (ModelState.IsValid)
             {
-                _db.Employees.Update(obj);
-                _db.SaveChanges();
+                await _employeeService.EditAsync(obj);
                 TempData["success"] = "Employee Data edited successfully!";
                 return RedirectToAction("Index");
             }
@@ -90,23 +70,13 @@ namespace EmployeeInfo.Controllers
         }
 
         [HttpPost]
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null || id == 0)
-            {
+            if (id == 0)
                 return NotFound();
-            }
 
-            var employeeFromDb = _db.Employees.Find(id);
-
-            if (employeeFromDb == null)
-            {
-                return NotFound();
-            }
-
-            _db.Employees.Remove(employeeFromDb);
-            _db.SaveChanges();
-            return Ok(true);
+            var result = await _employeeService.DeleteAsync(id);
+            return Ok(result);
         }
     }
 }

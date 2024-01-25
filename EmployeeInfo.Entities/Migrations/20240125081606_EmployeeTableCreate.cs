@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace EmployeeInfo.Migrations
+namespace EmployeeInfo.Entities.Migrations
 {
-    public partial class EmployeeTableAdded : Migration
+    public partial class EmployeeTableCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -16,7 +16,7 @@ namespace EmployeeInfo.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EmployeeName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EmployeeDesignation = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EmployeeDesignation = table.Column<int>(type: "int", nullable: false),
                     Salary = table.Column<double>(type: "float", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },

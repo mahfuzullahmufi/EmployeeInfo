@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace EmployeeInfo.Models
+namespace EmployeeInfo.Entities.Enum
 {
     public enum DesignationType
     {
