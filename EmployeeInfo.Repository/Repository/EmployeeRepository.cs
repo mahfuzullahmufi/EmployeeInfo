@@ -17,12 +17,12 @@ namespace EmployeeInfo.Repository.Repository
 
         public async Task<Employee?> GetByIdAsync(int id)
         {
-            return await _dbSet.FindAsync(id);
+            return await _dbContext.Employees.Include(e => e.Address).Include(e => e.Hobbies).Include(e => e.Projects).FirstOrDefaultAsync(x => x.EmployeeId == id);
         }
 
         public async Task<List<Employee>> GetAllAsync()
         {
-            var result = _dbContext.Employees.OrderBy(e => e.EmployeeName).ThenBy(x => x.Salary);
+            var result = _dbContext.Employees.Include(e => e.Address).Include(e => e.Hobbies).Include(e => e.Projects).OrderBy(e => e.EmployeeName).ThenBy(x => x.Salary);
             return result.ToList();
         }
 
@@ -34,13 +34,20 @@ namespace EmployeeInfo.Repository.Repository
 
         public async Task<Employee> EditAsync(Employee entity)
         {
-            _dbContext.Entry(entity).State = EntityState.Modified;
+            _dbContext.Update(entity);
             return entity;
         }
 
-        public async Task DeleteAsync(Employee entity)
+        public async Task<bool> DeleteAsync(int id)
         {
-            _dbSet.Remove(entity);
+            var entity = await _dbSet.FirstOrDefaultAsync(x => x.EmployeeId == id);
+            if (entity != null) 
+            {
+                _dbSet.Remove(entity);
+                await SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
 
         public async Task SaveChangesAsync()

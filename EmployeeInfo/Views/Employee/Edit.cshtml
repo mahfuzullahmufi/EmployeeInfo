@@ -1,7 +1,12 @@
-﻿@model Employee
+﻿@using EmployeeInfo.Service.VM
+@model EmployeeVm
+@{
+    var hobbies = GetHobbiesSelectList();
+    var projects = GetProjectsSelectList();
+}
 
 <form method="post" asp-action="Edit">
-    <input asp-for="Id" hidden />
+    <input asp-for="EmployeeId" hidden />
     <div class="border p-3 mt-4">
         <div class="row pb-2">
             <h2 class="text-primary">Edit Employee Data</h2>
@@ -29,6 +34,48 @@
             <span asp-validation-for="Salary" class="text-danger"></span>
         </div>
 
+
+        <div class="form-group">
+            <label>Address</label>
+            <div class="row">
+                <div class="col-md-4">
+                    <input asp-for="Address.Street" class="form-control" placeholder="Street" />
+                </div>
+                <div class="col-md-4">
+                    <input asp-for="Address.District" class="form-control" placeholder="District" />
+                </div>
+                <div class="col-md-4">
+                    <input asp-for="Address.Division" class="form-control" placeholder="Division" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group my-2">
+            <label asp-for="Hobbies" class="control-label">Hobbies:</label>
+            <select asp-for="Hobbies" class="form-control" multiple name="Hobbies">
+                @foreach (var value in hobbies)
+                {
+                    <option value="@value.Value">
+                        @value.Text
+                    </option>
+                }
+            </select>
+            <span asp-validation-for="Hobbies" class="text-danger"></span>
+        </div>
+
+        <div class="form-group my-2">
+            <label asp-for="Projects" class="control-label">Projects:</label>
+            <select asp-for="Projects" class="form-control" multiple name="Projects">
+                @foreach (var value in projects)
+                {
+                    <option value="@value.Value">
+                        @value.Text
+                    </option>
+                }
+            </select>
+            <span asp-validation-for="Projects" class="text-danger"></span>
+        </div>
+
         <button type="submit" class="btn btn-primary" style="width:150px">Update</button>
         <a asp-controller="Employee" asp-action="Index" class="btn btn-secondary" style="width:150px">
             Back
@@ -39,5 +86,34 @@
 @section Scripts {
     @{
         <partial name="_ValidationScriptsPartial" />
+    }
+}
+
+@{
+
+    List<SelectListItem> GetHobbiesSelectList()
+    {
+        var hobbies = new List<SelectListItem>
+        {
+            new SelectListItem { Value = "Reading", Text = "Reading" },
+            new SelectListItem { Value = "Sports", Text = "Sports" },
+            new SelectListItem { Value = "Travelling", Text = "Travelling" },
+        };
+
+        return hobbies;
+    }
+}
+
+@{
+    List<SelectListItem> GetProjectsSelectList()
+    {
+        var projects = new List<SelectListItem>
+        {
+            new SelectListItem { Value = "Clics", Text = "Clics" },
+            new SelectListItem { Value = "Paps", Text = "Paps" },
+            new SelectListItem { Value = "Othoba", Text = "Othoba" },
+        };
+
+        return projects;
     }
 }

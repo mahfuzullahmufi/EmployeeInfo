@@ -6,13 +6,17 @@ namespace EmployeeInfo.Entities.Models
 {
     public class Employee
     {
-        public int Id { get; set; }
+        public int EmployeeId { get; set; }
         [Required]
         [DisplayName("Employee Name")]
         public string EmployeeName { get; set; }
         [Required]
         [DisplayName("Employee Designation")]
         public DesignationType EmployeeDesignation { get; set; }
+        public int AddressId { get; set; }
+        public Address Address { get; set; }
+        public List<Hobby> Hobbies { get; set; }
+        public List<Project> Projects { get; set; }
         [Range(30000, 600000, ErrorMessage = "Salary must be between 30000 and 600000 !!")]
         public double? Salary { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;

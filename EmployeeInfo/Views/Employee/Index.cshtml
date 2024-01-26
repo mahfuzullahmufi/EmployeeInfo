@@ -29,34 +29,49 @@
             </select>
         </div>
     </div>
-   
+
 
     <table id="dataTable" class="table table-bordered table-striped" style="width:100%">
-    <thead>
-        <tr>
+        <thead>
+            <tr>
                 <th data-sort="asc" data-column="0">
-                 Employee Name
-                    <span class="float-right sort-icon">
-                <i class="bi bi-arrow-up"></i>
-                </span>
-            </th>
-            <th>
-                 Employee Designation
-            </th>
-                <th data-sort="asc" data-column="2">
-                 Employee Salary
+                    Employee Name
                     <span class="float-right sort-icon">
                         <i class="bi bi-arrow-up"></i>
                     </span>
-            </th>
-            <th>
-                Action
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+                </th>
+                <th>
+                    Employee Designation
+                </th>
+                <th>
+                    Street Address
+                </th>
+                <th>
+                    District
+                </th>
+                <th>
+                    Division
+                </th>
+                <th>
+                    Hobbies
+                </th>
+                <th>
+                    Projects
+                </th>
+                <th data-sort="asc" data-column="6">
+                    Employee Salary
+                    <span class="float-right sort-icon">
+                        <i class="bi bi-arrow-up"></i>
+                    </span>
+                </th>
+                <th>
+                    Action
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 </div>
 
 <div class="d-flex justify-content-between">
@@ -121,6 +136,11 @@
             var row = '<tr>';
             row += '<td>' + data.pagedData[i].employeeName + '</td>';
             row += '<td>' + getDesignationString(data.pagedData[i].employeeDesignation) + '</td>';
+            row += '<td>' + data.pagedData[i].street + '</td>';
+            row += '<td>' + data.pagedData[i].district + '</td>';
+            row += '<td>' + data.pagedData[i].division + '</td>';
+            row += '<td>' + data.pagedData[i].hobbies + '</td>';
+            row += '<td>' + data.pagedData[i].projects + '</td>';
             row += '<td>' + data.pagedData[i].salary + '</td>';
             row += '<td>';
             row += '<a href="/Employee/Edit?id=' + data.pagedData[i].id + ' " class="btn btn-primary mx-1">Edit</a>';

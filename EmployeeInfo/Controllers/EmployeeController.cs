@@ -1,5 +1,6 @@
 ﻿using EmployeeInfo.Entities.Models;
 using EmployeeInfo.Service.IService;
+using EmployeeInfo.Service.VM;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeInfo.Controllers
@@ -18,7 +19,7 @@ namespace EmployeeInfo.Controllers
             return View();
         }
 
-        public  async Task<IActionResult> LoadDataTable(int page = 1, int pageSize = 10)
+        public async Task<IActionResult> LoadDataTable(int page = 1, int pageSize = 10)
         {
             var model = await _employeeService.GetAllAsync(page, pageSize);
             return Json(model);
@@ -31,15 +32,12 @@ namespace EmployeeInfo.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Employee obj)
+        public async Task<IActionResult> Create(EmployeeVm model)
         {
-            if (ModelState.IsValid)
-            {
-                await _employeeService.AddAsync(obj);
-                TempData["success"] = "Employee added successfully!";
-                return RedirectToAction("Index");
-            }
-            return View(obj);
+            await _employeeService.AddAsync(model);
+            TempData["success"] = "Employee added successfully!";
+            return RedirectToAction("Index");
+            //return View(model);
         }
 
 
@@ -56,18 +54,12 @@ namespace EmployeeInfo.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Employee obj)
+        public async Task<IActionResult> Edit(EmployeeVm obj)
         {
-            if (ModelState.IsValid)
-            {
-                var result = await _employeeService.EditAsync(obj);
-                if(result)
-                {
-                    TempData["success"] = "Employee Data edited successfully!";
-                    return RedirectToAction("Index");
-                }
-            }
-            return View(obj);
+            var result = await _employeeService.EditAsync(obj);
+            TempData["success"] = "Employee Data edited successfully!";
+            return RedirectToAction("Index");
+            //return View(obj);
         }
 
         [HttpPost]
