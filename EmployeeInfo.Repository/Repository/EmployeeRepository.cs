@@ -1,4 +1,4 @@
-﻿using EmployeeInfo.Entities.Models;
+﻿using EmployeeInfo.Entities.Domain;
 using EmployeeInfo.Repository.Data;
 using EmployeeInfo.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
@@ -17,12 +17,12 @@ namespace EmployeeInfo.Repository.Repository
 
         public async Task<Employee?> GetByIdAsync(int id)
         {
-            return await _dbContext.Employees.Include(e => e.Address).Include(e => e.Hobbies).Include(e => e.Projects).FirstOrDefaultAsync(x => x.EmployeeId == id);
+            return await _dbContext.Employees.Include(e => e.Address).Include(e => e.Hobbies).Include(e => e.EmployeeProjects).ThenInclude(y => y.Project).FirstOrDefaultAsync(x => x.EmployeeId == id);
         }
 
         public async Task<List<Employee>> GetAllAsync()
         {
-            var result = _dbContext.Employees.Include(e => e.Address).Include(e => e.Hobbies).Include(e => e.Projects).OrderBy(e => e.EmployeeName).ThenBy(x => x.Salary);
+            var result = _dbContext.Employees.Include(e => e.Address).Include(e => e.Hobbies).Include(e => e.EmployeeProjects).ThenInclude(y => y.Project).OrderBy(e => e.EmployeeName).ThenBy(x => x.Salary);
             return result.ToList();
         }
 

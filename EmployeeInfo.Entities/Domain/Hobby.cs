@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EmployeeInfo.Entities.Models
+namespace EmployeeInfo.Entities.Domain
 {
     public class Hobby
     {

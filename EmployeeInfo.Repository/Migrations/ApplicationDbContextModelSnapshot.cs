@@ -22,7 +22,7 @@ namespace EmployeeInfo.Repository.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("EmployeeInfo.Entities.Models.Address", b =>
+            modelBuilder.Entity("EmployeeInfo.Entities.Domain.Address", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,25 +38,28 @@ namespace EmployeeInfo.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Street")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EmployeeId")
+                        .IsUnique();
+
                     b.ToTable("Addresses");
                 });
 
-            modelBuilder.Entity("EmployeeInfo.Entities.Models.Employee", b =>
+            modelBuilder.Entity("EmployeeInfo.Entities.Domain.Employee", b =>
                 {
                     b.Property<int>("EmployeeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeId"), 1L, 1);
-
-                    b.Property<int>("AddressId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -73,13 +76,25 @@ namespace EmployeeInfo.Repository.Migrations
 
                     b.HasKey("EmployeeId");
 
-                    b.HasIndex("AddressId")
-                        .IsUnique();
-
                     b.ToTable("Employees");
                 });
 
-            modelBuilder.Entity("EmployeeInfo.Entities.Models.Hobby", b =>
+            modelBuilder.Entity("EmployeeInfo.Entities.Domain.EmployeeProject", b =>
+                {
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("EmployeeId", "ProjectId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("EmployeeProjects");
+                });
+
+            modelBuilder.Entity("EmployeeInfo.Entities.Domain.Hobby", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -101,7 +116,7 @@ namespace EmployeeInfo.Repository.Migrations
                     b.ToTable("Hobbies");
                 });
 
-            modelBuilder.Entity("EmployeeInfo.Entities.Models.Project", b =>
+            modelBuilder.Entity("EmployeeInfo.Entities.Domain.Project", b =>
                 {
                     b.Property<int>("ProjectId")
                         .ValueGeneratedOnAdd()
@@ -118,35 +133,39 @@ namespace EmployeeInfo.Repository.Migrations
                     b.ToTable("Projects");
                 });
 
-            modelBuilder.Entity("EmployeeProject", b =>
+            modelBuilder.Entity("EmployeeInfo.Entities.Domain.Address", b =>
                 {
-                    b.Property<int>("EmployeesEmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProjectsProjectId")
-                        .HasColumnType("int");
-
-                    b.HasKey("EmployeesEmployeeId", "ProjectsProjectId");
-
-                    b.HasIndex("ProjectsProjectId");
-
-                    b.ToTable("EmployeeProject");
-                });
-
-            modelBuilder.Entity("EmployeeInfo.Entities.Models.Employee", b =>
-                {
-                    b.HasOne("EmployeeInfo.Entities.Models.Address", "Address")
-                        .WithOne("Employee")
-                        .HasForeignKey("EmployeeInfo.Entities.Models.Employee", "AddressId")
+                    b.HasOne("EmployeeInfo.Entities.Domain.Employee", "Employee")
+                        .WithOne("Address")
+                        .HasForeignKey("EmployeeInfo.Entities.Domain.Address", "EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Address");
+                    b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("EmployeeInfo.Entities.Models.Hobby", b =>
+            modelBuilder.Entity("EmployeeInfo.Entities.Domain.EmployeeProject", b =>
                 {
-                    b.HasOne("EmployeeInfo.Entities.Models.Employee", "Employee")
+                    b.HasOne("EmployeeInfo.Entities.Domain.Employee", "Employee")
+                        .WithMany("EmployeeProjects")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EmployeeInfo.Entities.Domain.Project", "Project")
+                        .WithMany("EmployeeProjects")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("EmployeeInfo.Entities.Domain.Hobby", b =>
+                {
+                    b.HasOne("EmployeeInfo.Entities.Domain.Employee", "Employee")
                         .WithMany("Hobbies")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -155,30 +174,19 @@ namespace EmployeeInfo.Repository.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("EmployeeProject", b =>
+            modelBuilder.Entity("EmployeeInfo.Entities.Domain.Employee", b =>
                 {
-                    b.HasOne("EmployeeInfo.Entities.Models.Employee", null)
-                        .WithMany()
-                        .HasForeignKey("EmployeesEmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.Navigation("Address")
                         .IsRequired();
 
-                    b.HasOne("EmployeeInfo.Entities.Models.Project", null)
-                        .WithMany()
-                        .HasForeignKey("ProjectsProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
+                    b.Navigation("EmployeeProjects");
 
-            modelBuilder.Entity("EmployeeInfo.Entities.Models.Address", b =>
-                {
-                    b.Navigation("Employee")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("EmployeeInfo.Entities.Models.Employee", b =>
-                {
                     b.Navigation("Hobbies");
+                });
+
+            modelBuilder.Entity("EmployeeInfo.Entities.Domain.Project", b =>
+                {
+                    b.Navigation("EmployeeProjects");
                 });
 #pragma warning restore 612, 618
         }

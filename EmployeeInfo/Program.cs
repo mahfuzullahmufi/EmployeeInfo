@@ -1,8 +1,7 @@
 using EmployeeInfo.Repository.Data;
 using EmployeeInfo.Repository.IRepository;
 using EmployeeInfo.Repository.Repository;
-using EmployeeInfo.Service.IService;
-using EmployeeInfo.Service.Service;
+using EmployeeInfo.Web.Extentions;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,8 +13,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
     ));
 
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+builder.Services.RegisterServices();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+//builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 var app = builder.Build();
 

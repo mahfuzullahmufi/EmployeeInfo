@@ -1,37 +1,26 @@
-﻿using EmployeeInfo.Entities.Models;
+﻿using EmployeeInfo.Entities.Domain;
+using EmployeeInfo.Repository.EntityConfiguration;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeInfo.Repository.Data
 {
     public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfiguration(new AddressConfiguration());
+            modelBuilder.ApplyConfiguration(new HobbyConfiguration());
+            modelBuilder.ApplyConfiguration(new EmployeeProjectConfiguration());
         }
 
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Hobby> Hobbies { get; set; }
         public DbSet<Project> Projects { get; set; }
+        public DbSet<EmployeeProject> EmployeeProjects { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Employee>()
-                .HasOne(e => e.Address)
-                .WithOne(x => x.Employee)
-                .HasForeignKey<Employee>(e => e.AddressId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Hobby>()
-                .HasOne(h => h.Employee)
-                .WithMany(e => e.Hobbies)
-                .HasForeignKey(h => h.EmployeeId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Employee>()
-                .HasMany(e => e.Projects)
-                .WithMany(p => p.Employees);
-        }
+        
     }
 }

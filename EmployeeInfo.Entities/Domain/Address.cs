@@ -1,4 +1,4 @@
-﻿namespace EmployeeInfo.Entities.Models
+﻿namespace EmployeeInfo.Entities.Domain
 {
     public class Address
     {
@@ -6,6 +6,7 @@
         public string Street { get; set; }
         public string District { get; set; }
         public string Division { get; set; }
+        public int EmployeeId { get; set; }
         public Employee Employee { get; set; }
     }
 }

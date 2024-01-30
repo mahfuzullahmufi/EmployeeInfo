@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace EmployeeInfo.Extentions
 {
-    public static class EnumExtensions
+    public static class EnumDisplayExtensions
     {
         public static string GetDisplayName(this Enum value)
         {

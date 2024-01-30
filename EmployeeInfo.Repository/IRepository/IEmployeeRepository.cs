@@ -1,4 +1,4 @@
-﻿using EmployeeInfo.Entities.Models;
+﻿using EmployeeInfo.Entities.Domain;
 
 namespace EmployeeInfo.Repository.IRepository
 {

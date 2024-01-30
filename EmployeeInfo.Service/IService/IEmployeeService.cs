@@ -1,15 +1,13 @@
-﻿using EmployeeInfo.Entities.Enum;
-using EmployeeInfo.Entities.Models;
-using EmployeeInfo.Service.VM;
+﻿using EmployeeInfo.Entities.Domain;
 
 namespace EmployeeInfo.Service.IService
 {
     public interface IEmployeeService
     {
-        Task<EmployeeVm?> GetByIdAsync(int id);
-        Task<PagedViewModel<EmployeeTableVm>> GetAllAsync(int page, int pageSize);
-        Task<bool> AddAsync(EmployeeVm model);
-        Task<bool> EditAsync(EmployeeVm entity);
+        Task<Employee> GetByIdAsync(int id);
+        Task<List<Employee>> GetAllAsync();
+        Task<Employee> AddAsync(Employee entity);
+        Task EditAsync(Employee entity);
         Task<bool> DeleteAsync(int id);
     }
 }

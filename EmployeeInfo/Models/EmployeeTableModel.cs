@@ -1,9 +1,8 @@
 ﻿using EmployeeInfo.Entities.Enum;
-using EmployeeInfo.Entities.Models;
 
-namespace EmployeeInfo.Service.VM
+namespace EmployeeInfo.Web.Models
 {
-    public class EmployeeTableVm
+    public class EmployeeTableModel
     {
         public int Id { get; set; }
         public string EmployeeName { get; set; }

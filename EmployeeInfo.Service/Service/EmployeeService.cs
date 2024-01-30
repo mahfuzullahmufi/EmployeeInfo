@@ -1,120 +1,54 @@
-﻿using EmployeeInfo.Entities.Models;
+﻿using EmployeeInfo.Entities.Domain;
 using EmployeeInfo.Repository.IRepository;
 using EmployeeInfo.Service.IService;
-using EmployeeInfo.Service.VM;
 
 namespace EmployeeInfo.Service.Service
 {
     public class EmployeeService : IEmployeeService
     {
+        private readonly IGenericRepository<Employee> _repository;
         private readonly IEmployeeRepository _employeeRepository;
-        public EmployeeService(IEmployeeRepository employeeRepository)
+        public EmployeeService(IGenericRepository<Employee> repository, IEmployeeRepository employeeRepository)
         {
 
+            _repository = repository;
             _employeeRepository = employeeRepository;
+        }
+
+        public async Task<List<Employee>> GetAllAsync()
+        {
+            return await _employeeRepository.GetAllAsync();
 
         }
 
-        public async Task<PagedViewModel<EmployeeTableVm>> GetAllAsync(int page, int pageSize)
+        public async Task<Employee> GetByIdAsync(int id)
         {
-            PagedViewModel<EmployeeTableVm> model = new PagedViewModel<EmployeeTableVm>();
-            var employeeList = await _employeeRepository.GetAllAsync();
-
-            List<EmployeeTableVm> employeeTableVmList = employeeList
-            .Select(e => new EmployeeTableVm
-            {
-                Id = e.EmployeeId,
-                EmployeeName = e.EmployeeName,
-                EmployeeDesignation = e.EmployeeDesignation,
-                Salary = e.Salary,
-                Street = e.Address.Street,
-                District = e.Address.District,
-                Division = e.Address.Division,
-                Hobbies = string.Join(", ", e.Hobbies.Select(obj => obj.HobbyName)),
-                Projects = string.Join(", ", e.Projects.Select(obj => obj.ProjectName)),
-            }).ToList();
-
-            model.CurrentPage = page;
-            model.PageSize = pageSize;
-            model.TotalCount = employeeList.Count();
-            model.TotalPages = (int)Math.Ceiling((double)model.TotalCount / pageSize);
-            model.PagedData = employeeTableVmList.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-
-            return model;
-
+            return await _employeeRepository.GetByIdAsync(id);
         }
 
-        public async Task<EmployeeVm?> GetByIdAsync(int id)
+        public async Task<Employee> AddAsync(Employee entity)
         {
-            var employee = await _employeeRepository.GetByIdAsync(id);
-
-            EmployeeVm employeeVm = new EmployeeVm();
-            employeeVm.EmployeeId = employee.EmployeeId;
-            employeeVm.EmployeeName = employee.EmployeeName;
-            employeeVm.EmployeeDesignation = employee.EmployeeDesignation;
-            employeeVm.Salary = employee.Salary;
-            employeeVm.Address = employee.Address;
-            employeeVm.Hobbies = employee.Hobbies
-            .Select(name => name.HobbyName)
-            .ToList();
-            employeeVm.Projects = employee.Projects
-            .Select(name => name.ProjectName)
-            .ToList();
-
-            return employeeVm;
+            var resutl = await _repository.Insert(entity);
+            await _repository.SaveChangesAsync();
+            return resutl;
         }
 
-        public async Task<bool> AddAsync(EmployeeVm model)
+        public async Task EditAsync(Employee entity)
         {
-            Employee entity = new Employee();
-            entity.EmployeeName = model.EmployeeName;
-            entity.EmployeeDesignation = model.EmployeeDesignation;
-            entity.Salary = model.Salary;
-            entity.Address = model.Address;
-            entity.Hobbies = model.Hobbies
-            .Select(name => new Hobby { HobbyName = name })
-            .ToList();
-            entity.Projects = model.Projects
-            .Select(name => new Project { ProjectName = name })
-            .ToList();
-
-            var employee = await _employeeRepository.AddAsync(entity);
-            await _employeeRepository.SaveChangesAsync();
-
-            if (employee.EmployeeId > 0)
-                return true;
-
-            return false;
-        }
-
-        public async Task<bool> EditAsync(EmployeeVm model)
-        {
-            Employee entity = await _employeeRepository.GetByIdAsync(model.EmployeeId);
-            if (entity != null)
-            {
-                entity.EmployeeName = model.EmployeeName;
-                entity.EmployeeDesignation = model.EmployeeDesignation;
-                entity.Salary = model.Salary;
-                entity.Address = model.Address;
-                entity.Hobbies = model.Hobbies
-                .Select(name => new Hobby { HobbyName = name })
-                .ToList();
-                entity.Projects = model.Projects
-                .Select(name => new Project { ProjectName = name })
-                .ToList();
-
-                var employee = await _employeeRepository.EditAsync(entity);
-                await _employeeRepository.SaveChangesAsync();
-                return true;
-            }
-            return false;
+            await _repository.Update(entity);
+            await _repository.SaveChangesAsync();
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            return await _employeeRepository.DeleteAsync(id);
-
-
+            var entity = await GetByIdAsync(id);
+            if (entity != null)
+            {
+                await _repository.Delete(entity);
+                await _repository.SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -1,8 +1,6 @@
-﻿@using EmployeeInfo.Service.VM
-@model EmployeeVm
+﻿@model EmployeeModel
 @{
     var hobbies = GetHobbiesSelectList();
-    var projects = GetProjectsSelectList();
 }
 
 <form method="post" asp-action="Edit">
@@ -39,13 +37,16 @@
             <label>Address</label>
             <div class="row">
                 <div class="col-md-4">
-                    <input asp-for="Address.Street" class="form-control" placeholder="Street" />
+                    <input asp-for="Street" class="form-control" placeholder="Street" />
+                    <span asp-validation-for="Street" class="text-danger"></span>
                 </div>
                 <div class="col-md-4">
-                    <input asp-for="Address.District" class="form-control" placeholder="District" />
+                    <input asp-for="District" class="form-control" placeholder="District" />
+                    <span asp-validation-for="District" class="text-danger"></span>
                 </div>
                 <div class="col-md-4">
-                    <input asp-for="Address.Division" class="form-control" placeholder="Division" />
+                    <input asp-for="Division" class="form-control" placeholder="Division" />
+                    <span asp-validation-for="Division" class="text-danger"></span>
                 </div>
             </div>
         </div>
@@ -66,11 +67,9 @@
         <div class="form-group my-2">
             <label asp-for="Projects" class="control-label">Projects:</label>
             <select asp-for="Projects" class="form-control" multiple name="Projects">
-                @foreach (var value in projects)
+                @foreach (var project in ViewBag.Projects)
                 {
-                    <option value="@value.Value">
-                        @value.Text
-                    </option>
+                    <option value="@project.ProjectId">@project.ProjectName</option>
                 }
             </select>
             <span asp-validation-for="Projects" class="text-danger"></span>
@@ -101,19 +100,5 @@
         };
 
         return hobbies;
-    }
-}
-
-@{
-    List<SelectListItem> GetProjectsSelectList()
-    {
-        var projects = new List<SelectListItem>
-        {
-            new SelectListItem { Value = "Clics", Text = "Clics" },
-            new SelectListItem { Value = "Paps", Text = "Paps" },
-            new SelectListItem { Value = "Othoba", Text = "Othoba" },
-        };
-
-        return projects;
     }
 }

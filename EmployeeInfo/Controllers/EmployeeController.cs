@@ -1,6 +1,7 @@
-﻿using EmployeeInfo.Entities.Models;
+﻿using AutoMapper;
 using EmployeeInfo.Service.IService;
-using EmployeeInfo.Service.VM;
+using EmployeeInfo.Web.Factories.Interfaces;
+using EmployeeInfo.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeInfo.Controllers
@@ -8,36 +9,49 @@ namespace EmployeeInfo.Controllers
     public class EmployeeController : Controller
     {
         private readonly IEmployeeService _employeeService;
+        private readonly IEmployeeFactory _employeeFactory;
+        private readonly IProjectService _projectService;
+        private readonly IMapper _mapper;
 
-        public EmployeeController(IEmployeeService employeeService)
+        public EmployeeController(IEmployeeService employeeService, IEmployeeFactory employeeFactory, IProjectService projectService, IMapper mapper)
         {
             _employeeService = employeeService;
+            _employeeFactory = employeeFactory;
+            _projectService = projectService;
+            _mapper = mapper;
         }
 
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             return View();
         }
 
         public async Task<IActionResult> LoadDataTable(int page = 1, int pageSize = 10)
         {
-            var model = await _employeeService.GetAllAsync(page, pageSize);
+            var model = await _employeeFactory.GetAllAsync(page, pageSize);
             return Json(model);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-
+            var projects = await _projectService.GetAllAsync();
+            ViewBag.Projects = _mapper.Map<List<ProjectModel>>(projects);
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(EmployeeVm model)
+        public async Task<IActionResult> Create(EmployeeModel model)
         {
-            await _employeeService.AddAsync(model);
-            TempData["success"] = "Employee added successfully!";
-            return RedirectToAction("Index");
-            //return View(model);
+            if (ModelState.IsValid)
+            {
+                await _employeeFactory.AddEmployeeAsync(model);
+                TempData["success"] = "Employee added successfully!";
+                return RedirectToAction("Index");
+            }
+
+            var projects = await _projectService.GetAllAsync();
+            ViewBag.Projects = _mapper.Map<List<ProjectModel>>(projects);
+            return View(model);
         }
 
 
@@ -46,20 +60,28 @@ namespace EmployeeInfo.Controllers
             if (id == 0)
                 return NotFound();
 
-            var employee = await _employeeService.GetByIdAsync(id);
+            var employee = await _employeeFactory.GetByIdAsync(id);
             if (employee == null)
                 return NotFound();
 
+            var projects = await _projectService.GetAllAsync();
+            ViewBag.Projects = _mapper.Map<List<ProjectModel>>(projects);
             return View(employee);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(EmployeeVm obj)
+        public async Task<IActionResult> Edit(EmployeeModel obj)
         {
-            var result = await _employeeService.EditAsync(obj);
-            TempData["success"] = "Employee Data edited successfully!";
-            return RedirectToAction("Index");
-            //return View(obj);
+            if (ModelState.IsValid)
+            {
+                await _employeeFactory.EditAsync(obj);
+                TempData["success"] = "Employee Data edited successfully!";
+                return RedirectToAction("Index");
+            }
+
+            var projects = await _projectService.GetAllAsync();
+            ViewBag.Projects = _mapper.Map<List<ProjectModel>>(projects);
+            return View(obj);
         }
 
         [HttpPost]
