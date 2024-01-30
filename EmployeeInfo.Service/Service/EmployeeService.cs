@@ -6,12 +6,10 @@ namespace EmployeeInfo.Service.Service
 {
     public class EmployeeService : IEmployeeService
     {
-        private readonly IGenericRepository<Employee> _repository;
         private readonly IEmployeeRepository _employeeRepository;
-        public EmployeeService(IGenericRepository<Employee> repository, IEmployeeRepository employeeRepository)
+        public EmployeeService(IEmployeeRepository employeeRepository)
         {
 
-            _repository = repository;
             _employeeRepository = employeeRepository;
         }
 
@@ -21,6 +19,16 @@ namespace EmployeeInfo.Service.Service
 
         }
 
+        public async Task<Employee> GetEmployeeByIdWithProjects(int id)
+        {
+            return await _employeeRepository.GetEmployeeByIdWithProjects(id);
+        }
+
+        public async Task<List<Employee>> GetEmployeesWithProjects()
+        {
+            return await _employeeRepository.GetEmployeesWithProjects();
+        }
+
         public async Task<Employee> GetByIdAsync(int id)
         {
             return await _employeeRepository.GetByIdAsync(id);
@@ -28,15 +36,15 @@ namespace EmployeeInfo.Service.Service
 
         public async Task<Employee> AddAsync(Employee entity)
         {
-            var resutl = await _repository.Insert(entity);
-            await _repository.SaveChangesAsync();
+            var resutl = await _employeeRepository.Insert(entity);
+            await _employeeRepository.SaveChangesAsync();
             return resutl;
         }
 
         public async Task EditAsync(Employee entity)
         {
-            await _repository.Update(entity);
-            await _repository.SaveChangesAsync();
+            await _employeeRepository.Update(entity);
+            await _employeeRepository.SaveChangesAsync();
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -44,8 +52,8 @@ namespace EmployeeInfo.Service.Service
             var entity = await GetByIdAsync(id);
             if (entity != null)
             {
-                await _repository.Delete(entity);
-                await _repository.SaveChangesAsync();
+                await _employeeRepository.Delete(entity);
+                await _employeeRepository.SaveChangesAsync();
                 return true;
             }
             return false;

@@ -5,54 +5,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeInfo.Repository.Repository
 {
-    public class EmployeeRepository : IEmployeeRepository
+    public class EmployeeRepository : GenericRepository<Employee>, IEmployeeRepository
     {
-        protected readonly ApplicationDbContext _dbContext;
-        private readonly DbSet<Employee> _dbSet;
-        public EmployeeRepository(ApplicationDbContext context)
+        public EmployeeRepository(ApplicationDbContext context) : base(context)
         {
-            _dbContext = context;
-            _dbSet = _dbContext.Set<Employee>();
         }
 
-        public async Task<Employee?> GetByIdAsync(int id)
+        public async Task<Employee> GetEmployeeByIdWithProjects(int id)
         {
-            return await _dbContext.Employees.Include(e => e.Address).Include(e => e.Hobbies).Include(e => e.EmployeeProjects).ThenInclude(y => y.Project).FirstOrDefaultAsync(x => x.EmployeeId == id);
+            return await _db.Include(e => e.Address).Include(e => e.Hobbies).Include(e => e.EmployeeProjects).ThenInclude(y => y.Project).FirstOrDefaultAsync(x => x.EmployeeId == id);
         }
 
-        public async Task<List<Employee>> GetAllAsync()
+        public async Task<List<Employee>> GetEmployeesWithProjects()
         {
-            var result = _dbContext.Employees.Include(e => e.Address).Include(e => e.Hobbies).Include(e => e.EmployeeProjects).ThenInclude(y => y.Project).OrderBy(e => e.EmployeeName).ThenBy(x => x.Salary);
+            var result = _db.Include(e => e.Address).Include(e => e.Hobbies).Include(e => e.EmployeeProjects).ThenInclude(y => y.Project).OrderBy(e => e.EmployeeName).ThenBy(x => x.Salary);
             return result.ToList();
-        }
-
-        public async Task<Employee> AddAsync(Employee entity)
-        {
-            _dbSet.Add(entity);
-            return entity;
-        }
-
-        public async Task<Employee> EditAsync(Employee entity)
-        {
-            _dbContext.Update(entity);
-            return entity;
-        }
-
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var entity = await _dbSet.FirstOrDefaultAsync(x => x.EmployeeId == id);
-            if (entity != null) 
-            {
-                _dbSet.Remove(entity);
-                await SaveChangesAsync();
-                return true;
-            }
-            return false;
-        }
-
-        public async Task SaveChangesAsync()
-        {
-            await _dbContext.SaveChangesAsync();
         }
     }
 }

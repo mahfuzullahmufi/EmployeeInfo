@@ -8,7 +8,7 @@ namespace EmployeeInfo.Repository.Repository
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         private readonly ApplicationDbContext _context;
-        private readonly DbSet<T> _db;
+        public readonly DbSet<T> _db;
 
         public GenericRepository(ApplicationDbContext context)
         {
@@ -30,6 +30,16 @@ namespace EmployeeInfo.Repository.Repository
                    _db.AsQueryable(),
                     (current, include) => current.Include(include)
                 ).ToListAsync();
+        }
+
+        public async Task<List<T>> GetsAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
+        {
+            return await includes
+               .Aggregate(
+                   _db.AsQueryable(),
+                   (current, include) => current.Include(include),
+                  c => c.Where(predicate)
+               ).ToListAsync().ConfigureAwait(false);
         }
 
         public async Task<T?> GetByIdAsync(int id)

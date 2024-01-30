@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using EmployeeInfo.Service.IService;
-using EmployeeInfo.Web.Factories.Interfaces;
+using EmployeeInfo.Web.Factories;
 using EmployeeInfo.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,7 +28,7 @@ namespace EmployeeInfo.Controllers
 
         public async Task<IActionResult> LoadDataTable(int page = 1, int pageSize = 10)
         {
-            var model = await _employeeFactory.GetAllAsync(page, pageSize);
+            var model = await _employeeFactory.GetEmployeesWithProjects(page, pageSize);
             return Json(model);
         }
 
@@ -60,7 +60,7 @@ namespace EmployeeInfo.Controllers
             if (id == 0)
                 return NotFound();
 
-            var employee = await _employeeFactory.GetByIdAsync(id);
+            var employee = await _employeeFactory.GetEmployeeByIdWithProjects(id);
             if (employee == null)
                 return NotFound();
 

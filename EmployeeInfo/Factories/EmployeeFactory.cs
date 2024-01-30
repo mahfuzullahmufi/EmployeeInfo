@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using EmployeeInfo.Entities.Domain;
 using EmployeeInfo.Service.IService;
-using EmployeeInfo.Web.Factories.Interfaces;
 using EmployeeInfo.Web.Models;
 
-namespace EmployeeInfo.Web.Factories.Implementions
+namespace EmployeeInfo.Web.Factories
 {
     public class EmployeeFactory : IEmployeeFactory
     {
@@ -16,10 +15,10 @@ namespace EmployeeInfo.Web.Factories.Implementions
             _mapper = mapper;
         }
 
-        public async Task<PagedViewModel<EmployeeTableModel>> GetAllAsync(int page, int pageSize)
+        public async Task<PagedViewModel<EmployeeTableModel>> GetEmployeesWithProjects(int page, int pageSize)
         {
             PagedViewModel<EmployeeTableModel> model = new PagedViewModel<EmployeeTableModel>();
-            var employeeList = await _employeeService.GetAllAsync();
+            var employeeList = await _employeeService.GetEmployeesWithProjects();
 
             List<EmployeeTableModel> employeeTableModelList = employeeList
             .Select(e => new EmployeeTableModel
@@ -45,9 +44,9 @@ namespace EmployeeInfo.Web.Factories.Implementions
 
         }
 
-        public async Task<EmployeeModel> GetByIdAsync(int id)
+        public async Task<EmployeeModel> GetEmployeeByIdWithProjects(int id)
         {
-            var employee = await _employeeService.GetByIdAsync(id);
+            var employee = await _employeeService.GetEmployeeByIdWithProjects(id);
 
             EmployeeModel employeeModel = new EmployeeModel();
             employeeModel.EmployeeId = employee.EmployeeId;
@@ -80,7 +79,7 @@ namespace EmployeeInfo.Web.Factories.Implementions
 
         public async Task EditAsync(EmployeeModel model)
         {
-            var entity = await _employeeService.GetByIdAsync(model.EmployeeId);
+            var entity = await _employeeService.GetEmployeeByIdWithProjects(model.EmployeeId);
             if (entity != null)
             {
                 entity.EmployeeName = model.EmployeeName;
@@ -93,7 +92,7 @@ namespace EmployeeInfo.Web.Factories.Implementions
                 entity.EmployeeProjects = model.Projects.Select(id => new EmployeeProject { ProjectId = id }).ToList();
 
                 await _employeeService.EditAsync(entity);
-                
+
             }
         }
     }

@@ -1,0 +1,224 @@
+﻿@model PagedViewModel<ProjectTableModel>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/dist/toastr.min.css">
+
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Project List</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="Project" asp-action="Create" class="btn btn-primary">
+                + &nbsp; Create New Project
+            </a>
+        </div>
+    </div>
+    <br /><br />
+
+    <div class="row my-2">
+        <div class="col-sm-2 form-group">
+            <label for="pageSize">Items per Page:</label>
+            <select id="pageSize" class="form-control" asp-for="PageSize" onchange="changePageSize()">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+            </select>
+        </div>
+    </div>
+
+
+    <table id="dataTable" class="table table-bordered table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th data-sort="asc" data-column="0">
+                    Project Name
+                    <span class="float-right sort-icon">
+                        <i class="bi bi-arrow-up"></i>
+                    </span>
+                </th>
+                <th>
+                    Employees
+                </th>
+                <th>
+                    Action
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<div class="d-flex justify-content-between">
+    <div>
+        <p id="showingInfo">
+        </p>
+    </div>
+
+    <div>
+        <ul id="pagination" class="pagination">
+        </ul>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/dist/toastr.min.js"></script>
+<script>
+    var currentPage = 1;
+    var pageSize = 10;
+
+    $(document).ready(function () {
+        fetchDataAndUpdateTable(currentPage, pageSize);
+
+        sortTable(0, 'asc');
+        $('#dataTable th .sort-icon').on('click', function () {
+            var columnIndex = $(this).closest('th').data('column');
+            var currentSortOrder = $(this).closest('th').data('sort');
+            var newSortOrder = (currentSortOrder === 'asc') ? 'desc' : 'asc';
+
+            $(this).closest('th').data('sort', newSortOrder);
+
+            $(this).find('i').toggleClass('bi-arrow-up', newSortOrder === 'asc');
+            $(this).find('i').toggleClass('bi-arrow-down', newSortOrder === 'desc');
+
+            sortTable(columnIndex, newSortOrder);
+        });
+
+    });
+
+    function fetchDataAndUpdateTable(page, pageSize) {
+        pageSize = pageSize || document.getElementById('pageSize').value;
+
+        $.ajax({
+            url: '@Url.Action("LoadDataTable", "Project")',
+            type: 'GET',
+            data: { page: page, pageSize: pageSize },
+            success: function (data) {
+                updateTable(data);
+                updatePagination(data);
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Request Error:", status, error);
+                console.log(xhr.responseText);
+            }
+        });
+    }
+
+    function updateTable(data) {
+        $('#dataTable tbody').empty();
+
+        for (var i = 0; i < data.pagedData.length; i++) {
+            var row = '<tr>';
+            row += '<td>' + data.pagedData[i].projectName + '</td>';
+            row += '<td>' + data.pagedData[i].employees + '</td>';
+            row += '<td>';
+            row += '<a href="/Project/Edit?id=' + data.pagedData[i].projectId + ' " class="btn btn-primary mx-1">Edit</a>';
+            row += '<a class="btn btn-danger" onclick="deleteItem(' + data.pagedData[i].projectId + ')">Delete</a>';
+            row += '</td>';
+            row += '</tr>';
+            $('#dataTable tbody').append(row);
+        }
+    }
+
+    function editItem(itemId) {
+        console.log("Edit Item with ID:", itemId);
+
+        $.ajax({
+            url: 'Project/Edit/' + itemId,
+            type: 'GET',
+            success: function (data) {
+                console.log("Response:", data);
+            }
+        })
+    }
+
+    function deleteItem(itemId) {
+        console.log("Delete Item with ID:", itemId);
+
+        $.ajax({
+            url: 'Project/Delete/' + itemId,
+            type: 'Delete',
+            success: function (data) {
+                console.log("Response:", data);
+                if (data) {
+                    fetchDataAndUpdateTable(currentPage, pageSize);
+                    toastr.error('Project deleted successfully!');
+                }
+            }
+        })
+    }
+
+    function changePageSize() {
+        var selectedValue = document.getElementById('pageSize').value;
+        currentPage = 1;
+        fetchDataAndUpdateTable(currentPage, selectedValue);
+    }
+
+    function changePage(pageChange) {
+        currentPage = pageChange;
+        fetchDataAndUpdateTable(pageChange);
+    }
+
+    function updatePagination(data) {
+        $('#pagination').empty();
+
+        var totalPages = data.totalPages;
+
+        for (var i = 1; i <= totalPages; i++) {
+            var $pageItem = $('<li class="page-item"><a class="page-link" href="#" onclick="changePage(' + i + ')">' + i + '</a></li>');
+
+            if (i === currentPage) {
+                $pageItem.addClass('active');
+            }
+
+            $('#pagination').append($pageItem);
+        }
+
+        $('#showingInfo').empty();
+        var startItem = (data.currentPage - 1) * data.pageSize + 1;
+        var endItem = Math.min(data.currentPage * data.pageSize, data.totalCount);
+        var showingInfo = 'Showing items ' + startItem + ' to ' + endItem + ' of ' + data.totalCount + '.';
+        $('#showingInfo').text(showingInfo);
+    }
+
+    function sortTable(columnIndex, sortOrder) {
+        var $table = $('#dataTable');
+        var rows = $table.find('tbody tr').get();
+
+        rows.sort(function (a, b) {
+            var aValue, bValue;
+
+            var columnType = getColumnValueType(columnIndex);
+
+            if (columnType === 'text') {
+                aValue = $(a).find('td:eq(' + columnIndex + ')').text().trim().toLowerCase();
+                bValue = $(b).find('td:eq(' + columnIndex + ')').text().trim().toLowerCase();
+            } else if (columnType === 'numeric') {
+                aValue = parseFloat($(a).find('td:eq(' + columnIndex + ')').text().trim()) || 0;
+                bValue = parseFloat($(b).find('td:eq(' + columnIndex + ')').text().trim()) || 0;
+            }
+
+            if (sortOrder === 'asc') {
+                return columnType === 'text' ? aValue.localeCompare(bValue) : aValue - bValue;
+            } else {
+                return columnType === 'text' ? bValue.localeCompare(aValue) : bValue - aValue;
+            }
+        });
+
+        $.each(rows, function (index, row) {
+            $table.find('tbody').append(row);
+        });
+    }
+
+    function getColumnValueType(columnIndex) {
+        var firstCellValue = $('#dataTable tbody tr:first td:eq(' + columnIndex + ')').text().trim();
+
+        return !isNaN(parseFloat(firstCellValue)) ? 'numeric' : 'text';
+    }
+</script>
+
+

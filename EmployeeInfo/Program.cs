@@ -1,7 +1,8 @@
 using EmployeeInfo.Repository.Data;
-using EmployeeInfo.Repository.IRepository;
-using EmployeeInfo.Repository.Repository;
+using EmployeeInfo.Repository.Extentions;
+using EmployeeInfo.Service.Extentions;
 using EmployeeInfo.Web.Extentions;
+using EmployeeInfo.Web.Setup;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,9 +14,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
     ));
 
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+builder.Services.RegisterRepositories();
 builder.Services.RegisterServices();
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-//builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.RegisterFactories();
+builder.Services.MapEntities();
 
 var app = builder.Build();
 
@@ -31,7 +33,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthorization();
 
 app.MapControllerRoute(

@@ -2,13 +2,9 @@
 
 namespace EmployeeInfo.Repository.IRepository
 {
-    public interface IEmployeeRepository
+    public interface IEmployeeRepository : IGenericRepository<Employee>
     {
-        Task<Employee?> GetByIdAsync(int id);
-        Task<List<Employee>> GetAllAsync();
-        Task<Employee> AddAsync(Employee entity);
-        Task<Employee> EditAsync(Employee entity);
-        Task<bool> DeleteAsync(int id);
-        Task SaveChangesAsync();
+        Task<Employee> GetEmployeeByIdWithProjects(int id);
+        Task<List<Employee>> GetEmployeesWithProjects();
     }
 }
