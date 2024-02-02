@@ -1,15 +1,14 @@
 ﻿using EmployeeInfo.Entities.Domain;
-using EmployeeInfo.Repository.IRepository;
 
-namespace EmployeeInfo.Service.IService
+namespace EmployeeInfo.Repository.IRepository
 {
-    public interface IEmployeeService 
+    public interface ILinq2DbEmployeeRepo
     {
         Task<Employee> GetEmployeeByIdWithProjects(int id);
-        Task<List<Employee>> GetAllAsync();
         Task<List<Employee>> GetEmployeesWithProjects();
         Task<bool> AddAsync(Employee entity);
         Task EditAsync(Employee entity);
         Task<bool> DeleteAsync(int id);
     }
 }
+

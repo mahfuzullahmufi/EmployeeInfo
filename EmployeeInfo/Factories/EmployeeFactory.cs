@@ -27,9 +27,9 @@ namespace EmployeeInfo.Web.Factories
                 EmployeeName = e.EmployeeName,
                 EmployeeDesignation = e.EmployeeDesignation,
                 Salary = e.Salary,
-                Street = e.Address.Street,
-                District = e.Address.District,
-                Division = e.Address.Division,
+                Street = e.Address == null ? "" : e.Address.Street,
+                District = e.Address == null ? "" : e.Address.District,
+                Division = e.Address == null ? "" : e.Address.Division,
                 Hobbies = string.Join(", ", e.Hobbies.Select(obj => obj.HobbyName)),
                 Projects = string.Join(", ", e.EmployeeProjects.Select(obj => obj.Project.ProjectName)),
             }).ToList();
@@ -53,9 +53,9 @@ namespace EmployeeInfo.Web.Factories
             employeeModel.EmployeeName = employee.EmployeeName;
             employeeModel.EmployeeDesignation = employee.EmployeeDesignation;
             employeeModel.Salary = employee.Salary;
-            employeeModel.Street = employee.Address.Street;
-            employeeModel.District = employee.Address.District;
-            employeeModel.Division = employee.Address.Division;
+            employeeModel.Street = employee.Address == null ? "" : employee.Address.Street;
+            employeeModel.District = employee.Address == null ? "" : employee.Address.District;
+            employeeModel.Division = employee.Address == null ? "" : employee.Address.Division;
             employeeModel.Hobbies = employee.Hobbies.Select(name => name.HobbyName).ToList();
             employeeModel.Projects = employee.EmployeeProjects.Select(name => name.Project.ProjectId).ToList();
 
@@ -69,7 +69,6 @@ namespace EmployeeInfo.Web.Factories
                 EmployeeName = model.EmployeeName,
                 EmployeeDesignation = model.EmployeeDesignation,
                 Salary = model.Salary,
-                Address = new Address { Street = model.Street, District = model.District, Division = model.Division },
                 Hobbies = model.Hobbies.Select(name => new Hobby { HobbyName = name }).ToList(),
                 EmployeeProjects = model.Projects.Select(id => new EmployeeProject { ProjectId = id }).ToList()
             };
@@ -85,9 +84,17 @@ namespace EmployeeInfo.Web.Factories
                 entity.EmployeeName = model.EmployeeName;
                 entity.EmployeeDesignation = model.EmployeeDesignation;
                 entity.Salary = model.Salary;
-                entity.Address.Street = model.Street;
-                entity.Address.District = model.District;
-                entity.Address.Division = model.Division;
+                if (entity.Address == null)
+                {
+                    entity.Address = new Address { Street = model.Street, District = model.District, Division = model.Division };
+
+                }
+                else
+                {
+                    entity.Address.Street = model.Street;
+                    entity.Address.District = model.District;
+                    entity.Address.Division = model.Division;
+                }
                 entity.Hobbies = model.Hobbies.Select(name => new Hobby { HobbyName = name }).ToList();
                 entity.EmployeeProjects = model.Projects.Select(id => new EmployeeProject { ProjectId = id }).ToList();
 

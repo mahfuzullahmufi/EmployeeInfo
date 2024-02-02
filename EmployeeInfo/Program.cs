@@ -3,7 +3,9 @@ using EmployeeInfo.Repository.Extentions;
 using EmployeeInfo.Service.Extentions;
 using EmployeeInfo.Web.Extentions;
 using EmployeeInfo.Web.Setup;
+using LinqToDB.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +16,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
     ));
 
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
-builder.Services.RegisterRepositories();
+builder.Services.RegisterRepositories(builder.Configuration);
 builder.Services.RegisterServices();
 builder.Services.RegisterFactories();
 builder.Services.MapEntities();

@@ -7,8 +7,10 @@ namespace EmployeeInfo.Repository.Repository
 {
     public class EmployeeRepository : GenericRepository<Employee>, IEmployeeRepository
     {
-        public EmployeeRepository(ApplicationDbContext context) : base(context)
+        private readonly Linq2DbDataConnection _connection;
+        public EmployeeRepository(ApplicationDbContext context, Linq2DbDataConnection connection) : base(context)
         {
+            _connection = connection;
         }
 
         public async Task<Employee> GetEmployeeByIdWithProjects(int id)
@@ -18,8 +20,18 @@ namespace EmployeeInfo.Repository.Repository
 
         public async Task<List<Employee>> GetEmployeesWithProjects()
         {
-            var result = _db.Include(e => e.Address).Include(e => e.Hobbies).Include(e => e.EmployeeProjects).ThenInclude(y => y.Project).OrderBy(e => e.EmployeeName).ThenBy(x => x.Salary);
-            return result.ToList();
+            try
+            {
+                //var result = _db.Include(e => e.Address).Include(e => e.Hobbies).Include(e => e.EmployeeProjects).ThenInclude(y => y.Project).OrderBy(e => e.EmployeeName).ThenBy(x => x.Salary);
+
+                var result = await _connection.Employees.Include(x => x.Address).ToListAsync();
+                return result.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using EmployeeInfo.Repository.Data;
+using EmployeeInfo.Repository.IRepository;
 using EmployeeInfo.Service.IService;
 using EmployeeInfo.Web.Factories;
 using EmployeeInfo.Web.Models;
@@ -11,13 +13,15 @@ namespace EmployeeInfo.Controllers
         private readonly IEmployeeService _employeeService;
         private readonly IEmployeeFactory _employeeFactory;
         private readonly IProjectService _projectService;
+        private readonly Linq2DbDataConnection _connection;
         private readonly IMapper _mapper;
 
-        public EmployeeController(IEmployeeService employeeService, IEmployeeFactory employeeFactory, IProjectService projectService, IMapper mapper)
+        public EmployeeController(IEmployeeService employeeService, IEmployeeFactory employeeFactory, IProjectService projectService, Linq2DbDataConnection connection, IMapper mapper)
         {
             _employeeService = employeeService;
             _employeeFactory = employeeFactory;
             _projectService = projectService;
+            _connection = connection;
             _mapper = mapper;
         }
 
@@ -34,7 +38,8 @@ namespace EmployeeInfo.Controllers
 
         public async Task<IActionResult> Create()
         {
-            var projects = await _projectService.GetAllAsync();
+            var projects = _connection.Projects.ToList();
+            //var projects = await _projectService.GetAllAsync();
             ViewBag.Projects = _mapper.Map<List<ProjectModel>>(projects);
             return View();
         }
@@ -64,7 +69,8 @@ namespace EmployeeInfo.Controllers
             if (employee == null)
                 return NotFound();
 
-            var projects = await _projectService.GetAllAsync();
+            //var projects = await _projectService.GetAllAsync();
+            var projects = _connection.Projects.ToList();
             ViewBag.Projects = _mapper.Map<List<ProjectModel>>(projects);
             return View(employee);
         }

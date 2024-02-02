@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using EmployeeInfo.Entities.Domain;
 using EmployeeInfo.Service.IService;
-using EmployeeInfo.Service.Service;
 using EmployeeInfo.Web.Models;
 
 namespace EmployeeInfo.Web.Factories
