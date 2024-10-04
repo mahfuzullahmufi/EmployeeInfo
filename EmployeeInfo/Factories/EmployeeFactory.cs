@@ -64,15 +64,22 @@ namespace EmployeeInfo.Web.Factories
 
         public async Task AddEmployeeAsync(EmployeeModel model)
         {
+            Address address  = new Address
+            {
+                Street = model.Street,
+                District  = model.District,
+                Division = model.Division
+            };
+
             Employee entity = new Employee
             {
                 EmployeeName = model.EmployeeName,
                 EmployeeDesignation = model.EmployeeDesignation,
                 Salary = model.Salary,
                 Hobbies = model.Hobbies.Select(name => new Hobby { HobbyName = name }).ToList(),
-                EmployeeProjects = model.Projects.Select(id => new EmployeeProject { ProjectId = id }).ToList()
+                EmployeeProjects = model.Projects.Select(id => new EmployeeProject { ProjectId = id }).ToList(),
+                Address = address
             };
-
             var result = await _employeeService.AddAsync(entity);
         }
 
